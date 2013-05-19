@@ -46,12 +46,12 @@ namespace :radiant do
           end
         end
       end
-      
+
       desc "Exports assets from database to assets directory"
       task :export => :environment do
         asset_path = File.join(RAILS_ROOT, "assets")
         mkdir_p asset_path
-        Asset.find(:all).each do |asset|
+        Asset.find_each do |asset|
           puts "Exporting #{asset.asset_file_name}"
           cp asset.asset.path, File.join(asset_path, asset.asset_file_name)
         end
