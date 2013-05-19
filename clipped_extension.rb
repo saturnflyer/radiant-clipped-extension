@@ -12,7 +12,7 @@ class ClippedExtension < Radiant::Extension
 
   def activate
     require 'paperclip/geometry_transformation'
-    if Asset.table_exists?
+    if ActiveRecord::Base.connection.table_exists?('assets')
       Page.send :include, PageAssetAssociations                                          # defines page-asset associations. likely to be generalised soon.
       Radiant::AdminUI.send :include, ClippedAdminUI unless defined? admin.asset         # defines shards for extension of the asset-admin interface
       Admin::PagesController.send :helper, Admin::AssetsHelper                           # currently only provides a description of asset sizes
@@ -34,7 +34,7 @@ class ClippedExtension < Radiant::Extension
       admin.page.edit.asset_popups.concat %w{upload_asset attach_asset}
       admin.configuration.show.add :config, 'admin/configuration/clipped_show', :after => 'defaults'
       admin.configuration.edit.add :form,   'admin/configuration/clipped_edit', :after => 'edit_defaults'
-    
+
       if Radiant::Config.table_exists? && Radiant::config["paperclip.command_path"]    # This is needed for testing if you are using mod_rails
         Paperclip.options[:command_path] = Radiant::config["paperclip.command_path"]
       end
