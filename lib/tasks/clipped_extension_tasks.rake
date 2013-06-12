@@ -1,7 +1,7 @@
 namespace :radiant do
   namespace :extensions do
     namespace :clipped do
-      
+
       desc "Runs the migration of the Clipped extension"
       task :migrate => :environment do
         require 'radiant/extension_migrator'
@@ -9,7 +9,7 @@ namespace :radiant do
           puts "Assimilating Assets extension migration 20110513205050"
           ClippedExtension.migrator.new(:up, ClippedExtension.migrations_path).send(:assume_migrated_upto_version, '20110513205050')
         end
-        
+
         if ENV["VERSION"]
           ClippedExtension.migrator.migrate(ENV["VERSION"].to_i)
           Rake::Task['db:schema:dump'].invoke
@@ -18,7 +18,7 @@ namespace :radiant do
           Rake::Task['db:schema:dump'].invoke
         end
       end
-      
+
       desc "Copies public assets of the Clipped extension to the instance public/ directory."
       task :update => [:environment, :initialize] do
         is_svn_or_dir = proc {|path| path =~ /\.svn/ || File.directory?(path) }
@@ -64,14 +64,14 @@ namespace :radiant do
         if File.exist?(asset_path) && File.stat(asset_path).directory?
           Dir.glob("#{asset_path}/*").each do |file_with_path|
             if File.stat(file_with_path).file?
-              new_asset = File.new(file_with_path) 
+              new_asset = File.new(file_with_path)
               puts "Creating #{File.basename(file_with_path)}"
               Asset.create :asset => new_asset
             end
           end
         end
       end
-      
+
       desc "Migrates page attachments from the original page attachments extension into new Assets"
       task :migrate_from_page_attachments => :environment do
         puts "This task can clean up traces of the page_attachments (think table records and files currently in /public/page_attachments).
@@ -97,7 +97,7 @@ If you would like to use this mode type \"yes\", type \"no\" or just hit enter t
         Rake::Task['paperclip:refresh'].invoke
         puts "Done."
       end
-      
+
       desc "Migrates from old 'assets' extension."
       task :migrate_from_assets => :environment do
         Asset.delete_all("thumbnail IS NOT NULL OR parent_id IS NOT NULL")
@@ -114,7 +114,7 @@ If you would like to use this mode type \"yes\", type \"no\" or just hit enter t
       end
 
       desc "Generate an example initializer"
-      task :initialize do
+      task :initialize => :environment do
         puts "Copying initializer from ClippedExtension"
         cp ClippedExtension.root + "/lib/generators/templates/clipped_config.rb", RAILS_ROOT + "/config/initializers/", :verbose => false
       end
